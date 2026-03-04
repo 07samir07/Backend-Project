@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+
 const app = express();
 
 app.use(
@@ -18,4 +19,12 @@ app.use(express.static("public")); //STATIC FILES KO SERVE KARNE KE LIYE
 
 app.use(cookieParser()); //COOKIES KO PARSE KARNE KE LIYE
 
+//Routes import
+
+import userRouter from "./routes/user.routes.js";
+
+//Routes use
+app.use("/api/v1/users", userRouter);
+
+//http:localhost:8000/api/v1/users/register
 export { app };
