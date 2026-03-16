@@ -19,8 +19,8 @@ const createTweet = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to create tweet please try again");
   }
   return res
-    .status(200)
-    .json(new ApiResponse(200, tweet, "Tweet created successfully"));
+    .status(201)
+    .json(new ApiResponse(201, tweet, "Tweet created successfully"));
 });
 
 //UPDATE TWEET
