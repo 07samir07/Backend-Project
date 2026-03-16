@@ -10,7 +10,7 @@ import { Like } from "../models/like.model.js";
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
-  const video = Video.findById(videoId);
+  const video = await Video.findById(videoId);
 
   if (!video) {
     throw new ApiError(404, "Video not found");
@@ -79,7 +79,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
   };
   const comments = await Comment.aggregatePaginate(commentsAggregate, options);
 
-  return res.status(200).json(200, comments, "Comments fetched successfully");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, comments, "Comments fetched successfully"));
 });
 
 //add a comment to a video
