@@ -141,17 +141,16 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       },
     },
   ]);
-});
-
-return (
-  res.status(200),
-  json(
-    new ApiResponse(
-      200,
-      likedVideosAggregate,
-      "liked videos fetched successfully"
+  return (
+    res.status(200),
+    json(
+      new ApiResponse(
+        200,
+        likedVideosAggregate,
+        "liked videos fetched successfully"
+      )
     )
-  )
-);
+  );
+});
 
 export { toggleVideoLike, toggleCommentLike, toggleTweetLike, getLikedVideos };
