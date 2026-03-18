@@ -267,4 +267,6 @@ const getVideoById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video[0], "Video details fetched successfully"));
 });
 
-export { getAllVideos };
+//update video details like title,description, thumbnail
+
+export { getAllVideos, getVideoById };
