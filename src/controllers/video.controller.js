@@ -262,13 +262,6 @@ const getVideoById = asyncHandler(async (req, res) => {
     },
   });
 
-  //add this video to user watch history
-  await User.findByIdAndUpdate(req.user?._id, {
-    $addToSet: {
-      watchHistory: videoId,
-    },
-  });
-
   return res
     .status(200)
     .json(new ApiResponse(200, video[0], "Video details fetched successfully"));
