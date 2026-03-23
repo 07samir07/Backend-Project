@@ -12,7 +12,7 @@ const overviewCards = [
   {
     title: 'Backend compatible',
     description:
-      'Uses the real `/api/v1/users`, `/api/v1/video`, `/api/v1/dashboard`, and `/api/v1/healthcheck` endpoints instead of mock data.',
+      'Targets your existing `/api/v1/users`, `/api/v1/video`, `/api/v1/dashboard`, and `/api/v1/healthcheck` routes.',
   },
   {
     title: 'Clean structure',
@@ -60,7 +60,8 @@ export default function App() {
           <p className="eyebrow">Frontend Starter</p>
           <h2>Clean UI/UX for your video backend</h2>
           <p className="hero-copy">
-            This React app now talks directly to your real Express routes for auth, health checks, public videos, and creator analytics, and the backend can also serve the built frontend bundle.
+            This React app gives you a polished starting point for auth, public video discovery,
+            and creator analytics while staying aligned with your current Express API routes.
           </p>
         </div>
         <StatusBanner status={healthStatus.type} message={healthStatus.message} />

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { getCurrentUser, login, logout, refreshSession, register } from '../../api/endpoints';
+import { getCurrentUser, login, register } from '../../api/endpoints';
 import { SectionCard } from '../../components/SectionCard';
 import { StatusBanner } from '../../components/StatusBanner';
 
@@ -24,7 +24,7 @@ export const AuthPanel = ({ authState, setAuthState }) => {
   const [status, setStatus] = useState({ type: 'info', message: '' });
   const [loading, setLoading] = useState(false);
 
-  const isAuthenticated = useMemo(() => Boolean(authState.accessToken), [authState.accessToken]);
+  const isAuthenticated = useMemo(() => Boolean(authState.accessToken), [authState]);
 
   const updateLoginField = (event) => {
     const { name, value } = event.target;
@@ -46,12 +46,14 @@ export const AuthPanel = ({ authState, setAuthState }) => {
 
     try {
       const response = await login(loginForm);
-      setAuthState({
+      const nextAuthState = {
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
         user: response.data.user,
-      });
-      setStatus({ type: 'success', message: 'Frontend and backend session connected successfully.' });
+      };
+
+      setAuthState(nextAuthState);
+      setStatus({ type: 'success', message: response.message });
       setLoginForm(initialLoginState);
     } catch (error) {
       setStatus({ type: 'error', message: error.message });
@@ -74,7 +76,7 @@ export const AuthPanel = ({ authState, setAuthState }) => {
       });
 
       const response = await register(formData);
-      setStatus({ type: 'success', message: `${response.message}. You can now log in with the new account.` });
+      setStatus({ type: 'success', message: response.message });
       setRegisterForm(initialRegisterState);
     } catch (error) {
       setStatus({ type: 'error', message: error.message });
@@ -90,29 +92,6 @@ export const AuthPanel = ({ authState, setAuthState }) => {
     try {
       const response = await getCurrentUser(authState.accessToken);
       setAuthState((current) => ({ ...current, user: response.data }));
-      setStatus({ type: 'success', message: 'Fetched current user from backend.' });
-    } catch (error) {
-      setStatus({ type: 'error', message: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const refreshTokens = async () => {
-    if (!authState.refreshToken) {
-      setStatus({ type: 'error', message: 'No refresh token available.' });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await refreshSession(authState.refreshToken);
-      setAuthState((current) => ({
-        ...current,
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-      }));
       setStatus({ type: 'success', message: response.message });
     } catch (error) {
       setStatus({ type: 'error', message: error.message });
@@ -121,42 +100,20 @@ export const AuthPanel = ({ authState, setAuthState }) => {
     }
   };
 
-  const handleLogout = async () => {
-    if (!authState.accessToken) {
-      setAuthState({ accessToken: '', refreshToken: '', user: null });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await logout(authState.accessToken);
-      setStatus({ type: 'success', message: 'Logged out from backend and cleared the frontend session.' });
-    } catch (error) {
-      setStatus({
-        type: 'error',
-        message: `${error.message}. Local session was still cleared to avoid a stale login state.`,
-      });
-    } finally {
-      setAuthState({ accessToken: '', refreshToken: '', user: null });
-      setLoading(false);
-    }
+  const logout = () => {
+    setAuthState({ accessToken: '', refreshToken: '', user: null });
+    setStatus({ type: 'success', message: 'Local session cleared.' });
   };
 
   return (
     <SectionCard
       title="Authentication"
-      subtitle="Login, register, refresh, and validate the actual session returned by your backend."
+      subtitle="Login, register, and inspect the authenticated user payload returned by your backend."
       actions={
         isAuthenticated ? (
-          <div className="button-group">
-            <button className="secondary-button" onClick={refreshProfile} type="button">
-              Fetch profile
-            </button>
-            <button className="secondary-button" onClick={refreshTokens} type="button">
-              Refresh tokens
-            </button>
-          </div>
+          <button className="secondary-button" onClick={refreshProfile} type="button">
+            Refresh profile
+          </button>
         ) : null
       }
     >
@@ -165,7 +122,7 @@ export const AuthPanel = ({ authState, setAuthState }) => {
         <form className="panel-form" onSubmit={handleLogin}>
           <div>
             <p className="eyebrow">Login</p>
-            <h3>Connect to live auth routes</h3>
+            <h3>Use existing credentials</h3>
           </div>
           <label>
             Email
@@ -187,7 +144,7 @@ export const AuthPanel = ({ authState, setAuthState }) => {
         <form className="panel-form" onSubmit={handleRegister}>
           <div>
             <p className="eyebrow">Register</p>
-            <h3>Create backend user</h3>
+            <h3>Create a new account</h3>
           </div>
           <label>
             Full name
@@ -222,17 +179,18 @@ export const AuthPanel = ({ authState, setAuthState }) => {
       <div className="auth-summary">
         <div>
           <p className="eyebrow">Session</p>
-          <h3>{isAuthenticated ? 'Backend session active' : 'Not signed in'}</h3>
+          <h3>{isAuthenticated ? 'Authenticated' : 'Not signed in'}</h3>
           <p>
-            Access token, refresh token, and the current user payload are stored together so protected routes can be called immediately after login.
+            The frontend stores access and refresh tokens locally so you can call
+            protected routes like `/users/current-user` and `/dashboard/stats`.
           </p>
         </div>
-        <button className="ghost-button" onClick={handleLogout} type="button">
-          Logout
+        <button className="ghost-button" onClick={logout} type="button">
+          Clear local session
         </button>
       </div>
 
-      <pre className="code-block">{JSON.stringify(authState, null, 2)}</pre>
+      <pre className="code-block">{JSON.stringify(authState.user, null, 2) || 'null'}</pre>
     </SectionCard>
   );
 };

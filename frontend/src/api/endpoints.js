@@ -17,20 +17,6 @@ export const register = (formData) =>
     body: formData,
   });
 
-export const logout = (token) =>
-  apiRequest({
-    endpoint: '/api/v1/users/logout',
-    method: 'POST',
-    token,
-  });
-
-export const refreshSession = (refreshToken) =>
-  apiRequest({
-    endpoint: '/api/v1/users/refresh-token',
-    method: 'POST',
-    body: { refreshToken },
-  });
-
 export const getCurrentUser = (token) =>
   apiRequest({
     endpoint: '/api/v1/users/current-user',
