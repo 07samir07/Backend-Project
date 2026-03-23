@@ -6,7 +6,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
 import { Like } from "../models/like.model.js";
-import { Comment } from "../models/comment.model.js";
 
 //GET ALL VIDEOS BASED ON QUERY,SORT AND PAGINATION
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -38,7 +37,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
     pipeline.push({
       $match: {
-        owner: new mongoose.Types.ObjectId(userId),
+        owner: new mongoose.Schema.Types.ObjectId(userId),
       },
     });
   }
@@ -71,7 +70,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         as: "ownerDetails",
         pipeline: [
           {
-            $project: {
+            $projects: {
               username: 1,
               "avatar.url": 1,
             },
@@ -162,7 +161,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   const video = await Video.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(videoId),
+        _id: new mongoose.Schema.Types.ObjectId(videoId),
       },
     },
     {
@@ -433,5 +432,6 @@ export {
   updateVideo,
   togglePublishStatus,
   deleteVideo,
+  updateVideo,
   publishVideo,
 };
